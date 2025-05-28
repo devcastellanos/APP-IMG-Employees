@@ -7,6 +7,6 @@ export default defineConfig({
   preview: {
     host: true,
     port: 4173,
-    allowedHosts: ['img.in.grupotarahumara.com.mx'],
+    allowedHosts: ['img-empleados.192.168.29.40.sslip.io'],
   },
 });
