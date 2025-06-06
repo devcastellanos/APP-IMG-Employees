@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { FiDownload, FiPlus } from "react-icons/fi";
 
@@ -19,6 +19,8 @@ function App() {
   const [empleados, setEmpleados] = useState([]);
   const [fotosDisponibles, setFotosDisponibles] = useState([]);
   const [empleadoVerificado, setEmpleadoVerificado] = useState(null);
+
+  const fileInputRefs = useRef({});
 
   useEffect(() => {
     if (numeroEmpleado.trim() === "") {
@@ -88,6 +90,32 @@ function App() {
   const obtenerRutaFoto = (personal) => {
     const match = fotosDisponibles.find((ruta) => ruta.includes(`/${personal}.jpg`));
     return match ? `${API_FOTOS}${match}` : null;
+  };
+
+  const handleCargarFoto = (empId) => {
+    if (fileInputRefs.current[empId]) {
+      fileInputRefs.current[empId].click();
+    }
+  };
+
+  const handleArchivoSeleccionado = async (event, empId) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("foto", file);
+    formData.append("numeroEmpleado", empId);
+
+    try {
+      await axios.post(`${API_URL}/api/upload`, formData, {
+        auth: { username: API_USER, password: API_PASSWORD },
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("✅ Foto subida correctamente");
+    } catch (err) {
+      alert("❌ Error al subir la foto");
+    }
   };
 
   return (
@@ -373,39 +401,64 @@ function App() {
                   </div>
                 </div>
 
-                {/* Parte inferior - botones */}
+                {/* Input oculto y botones */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  ref={(el) => (fileInputRefs.current[emp.Personal] = el)}
+                  style={{ display: "none" }}
+                  onChange={(e) => handleArchivoSeleccionado(e, emp.Personal)}
+                />
+
                 <div style={{
                   display: "flex",
                   justifyContent: "center",
                   gap: "0.5rem",
                   marginTop: "0.8rem"
                 }}>
-                  <button title="Descargar foto" style={{
-                    backgroundColor: "#9A3324",
-                    border: "none",
-                    padding: "0.5rem",
-                    borderRadius: "0.4rem",
-                    cursor: "pointer"
-                  }}
-                  onClick={() => {
-                    if (fotoURL) {
-                      const link = document.createElement("a");
-                      link.href = fotoURL;
-                      link.download = `${emp.Personal}.jpg`;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }
-                  }}>
+                  <button
+                    title="Descargar foto"
+                    style={{
+                      backgroundColor: "#9A3324",
+                      border: "none",
+                      padding: "0.5rem",
+                      borderRadius: "0.4rem",
+                      cursor: "pointer"
+                    }}
+                    onClick={async () => {
+                      if (fotoURL) {
+                        try {
+                          const response = await fetch(fotoURL);
+                          const blob = await response.blob();
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = `${emp.Personal}.jpg`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        } catch (error) {
+                          alert("❌ No se pudo descargar la imagen");
+                        }
+                      }
+                    }}
+                  >
                     <FiDownload size={18} color="#fff" />
                   </button>
-                  <button title="Agregar foto" style={{
-                    backgroundColor: "#444",
-                    border: "none",
-                    padding: "0.5rem",
-                    borderRadius: "0.4rem",
-                    cursor: "pointer"
-                  }}>
+
+                  <button
+                    title="Agregar foto"
+                    onClick={() => handleCargarFoto(emp.Personal)}
+                    style={{
+                      backgroundColor: "#444",
+                      border: "none",
+                      padding: "0.5rem",
+                      borderRadius: "0.4rem",
+                      cursor: "pointer"
+                    }}
+                  >
                     <FiPlus size={18} color="#fff" />
                   </button>
                 </div>
