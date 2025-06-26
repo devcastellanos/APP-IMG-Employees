@@ -5,9 +5,8 @@ import { FiDownload, FiPlus } from "react-icons/fi";
 const API_URL = import.meta.env.VITE_API_URL;
 const API_USER = import.meta.env.VITE_API_USER;
 const API_PASSWORD = import.meta.env.VITE_API_PASSWORD;
-
-const API_EMPLEADOS = "http://api-cursos.192.168.29.40.sslip.io/api/users";
-const API_FOTOS = "http://api-img-tara.192.168.29.40.sslip.io";
+const API_EMPLEADOS = import.meta.env.VITE_API_EMPLEADOS;
+const API_FOTOS = import.meta.env.VITE_API_FOTOS;
 
 function App() {
   const [tab, setTab] = useState(0); // 0: subir, 1: ver activos
