@@ -61,30 +61,30 @@ function App() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!foto || !numeroEmpleado) {
-      alert("Por favor completa todos los campos");
-      return;
-    }
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!foto || !numeroEmpleado) {
+  //     alert("Por favor completa todos los campos");
+  //     return;
+  //   }
 
-    const formData = new FormData();
-    formData.append("foto", foto);
-    formData.append("numeroEmpleado", numeroEmpleado);
+  //   const formData = new FormData();
+  //   formData.append("foto", foto);
+  //   formData.append("numeroEmpleado", numeroEmpleado);
 
-    try {
-      const res = await axios.post(`${API_URL}/api/upload`, formData, {
-        auth: { username: API_USER, password: API_PASSWORD },
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+  //   try {
+  //     const res = await axios.post(`${API_URL}/api/upload`, formData, {
+  //       auth: { username: API_USER, password: API_PASSWORD },
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
 
-      setRutaFoto(API_URL + res.data.ruta);
-      setMensaje("✅ Foto subida correctamente");
-      setFoto(null);
-    } catch {
-      setMensaje("❌ Error al subir la foto");
-    }
-  };
+  //     setRutaFoto(API_URL + res.data.ruta);
+  //     setMensaje("✅ Foto subida correctamente");
+  //     setFoto(null);
+  //   } catch {
+  //     setMensaje("❌ Error al subir la foto");
+  //   }
+  // };
 
   const obtenerRutaFoto = (personal) => {
     const match = fotosDisponibles.find((ruta) => ruta.includes(`/${personal}.jpg`));
@@ -173,7 +173,7 @@ function App() {
           Fotos de Empleados
         </h2>
 
-        <form onSubmit={handleSubmit} style={{
+        <form style={{
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
@@ -238,7 +238,7 @@ function App() {
             />
           </label>
 
-          <button
+          {/* <button
             type="submit"
             style={{
               backgroundColor: "#9A3324",
@@ -251,7 +251,7 @@ function App() {
             }}
           >
             Subir o Reemplazar Foto
-          </button>
+          </button> */}
 
           {mensaje && (
             <p style={{
