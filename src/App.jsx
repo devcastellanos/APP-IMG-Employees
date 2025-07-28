@@ -106,13 +106,26 @@ function App() {
     formData.append("numeroEmpleado", empId);
 
     try {
-      await axios.post(`${API_URL}/api/upload`, formData, {
+      const res = await axios.post(`${API_URL}/api/upload`, formData, {
         auth: { username: API_USER, password: API_PASSWORD },
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       alert("✅ Foto subida correctamente");
+
+      // 🔄 Refrescar vista previa si corresponde al mismo empleado del formulario
+      if (empId.toString() === numeroEmpleado.trim()) {
+        const fotoURL = API_URL + res.data.ruta + `?t=${Date.now()}`; // Forzar actualización con timestamp
+        setRutaFoto(fotoURL);
+        setMensaje("✅ Foto subida correctamente");
+      }
+
+      // 🔄 Actualizar lista general de fotos disponibles (opcional si deseas reflejar en pestaña 2)
+      const resFotos = await axios.get(`${API_FOTOS}/api/uploads`);
+      setFotosDisponibles(resFotos.data.archivos);
+
     } catch (err) {
+      console.error(err);
       alert("❌ Error al subir la foto");
     }
   };
